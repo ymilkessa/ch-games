@@ -56,13 +56,20 @@ class GameHistory():
 
 
 class GameDriver:
-    def __init__(self, player1=HumanPlayer(),
+    def __init__(self, game_type="chess",
+                 player1=HumanPlayer(),
                  player2=HumanPlayer(),
                  size=8,
                  history_enabled=False):
 
         # create board, set up, and initialize game state
-        b = Board(int(size), CheckerFactory())
+        if not game_type in ["checkers", "chess"]:
+            raise Exception(f"Invalid argument {game_type}")
+        # TODO: Add options for Chess GameState, Board(?), PieceFactory
+        if game_type == "chess":
+            pass
+        else:
+            b = Board(int(size), CheckerFactory())
         b.set_up()
         self._game_state = CheckersGameState(b, WHITE, None)
 
@@ -97,6 +104,9 @@ class GameDriver:
 
             if self.history_enabled:
                 option = input("undo, redo, or next\n")
+                while option not in ["undo", "redo", "next"]:
+                    print(f"Please enter a valid command; given {option}")
+                    option = input("undo, redo, or next\n")
             else:
                 # continue as if next was entered
                 option = "next"
@@ -123,24 +133,29 @@ class GameDriver:
 if __name__ == "__main__":
 
     # take in arguments and setup defaults if necessary
+    # TODO: Change this to accommodate chess.
     if len(sys.argv) > 1:
-        player1 = Player.create_player(sys.argv[1])
+        game_type = sys.argv[1]
+    else:
+        game_type = "chess"
+    if len(sys.argv) > 2:
+        player1 = Player.create_player(sys.argv[2])
         if not player1:
             sys.exit()
     else:
         player1 = Player.create_player("human")
-    if len(sys.argv) > 2:
-        player2 = Player.create_player(sys.argv[2])
+    if len(sys.argv) > 3:
+        player2 = Player.create_player(sys.argv[3])
         if not player2:
             sys.exit()
     else:
         player2 = Player.create_player("human")
-    if len(sys.argv) > 3:
-        size = sys.argv[3]
+    if len(sys.argv) > 4:
+        size = sys.argv[4]
     else:
         size = 8
-    history = len(sys.argv) > 4 and sys.argv[4] == "history"
+    history = len(sys.argv) > 5 and sys.argv[5] == "history"
 
     # create driver and start game
-    game = GameDriver(player1, player2, size, history)
+    game = GameDriver(game_type, player1, player2, size, history)
     game.start_game()

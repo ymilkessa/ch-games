@@ -7,6 +7,7 @@ class Piece:
         self._board = board
         # read only property
         self._side = side
+        self._symbol = None  # Gets added in concrete class
 
     @property
     def side(self):

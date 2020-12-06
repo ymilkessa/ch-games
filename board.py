@@ -18,6 +18,14 @@
 # ⚈
 # ⚉
 
+# Whites:
+# ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+# ♙
+
+# Blacks:
+# ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+# ♟
+
 
 from constants import ALPHABET
 
