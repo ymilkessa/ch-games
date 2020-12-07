@@ -16,8 +16,6 @@ class CheckersGameState(GameState):
 
         return options
 
-
-
     def check_loss(self, side=None):
         if not side:
             side = self._current_side
