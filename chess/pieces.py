@@ -1,23 +1,30 @@
 from piece import Piece
 from piece_factory import PieceFactory
 from constants import BLACK, WHITE
+from chess.moves import ChessMove
 
 
 class ChessPieceFactory(PieceFactory):
     """Generates the chess piece for a given slot when setting up the board"""
     def create_pieces(self, board, space):
         x, y = space.row, space.col
-        if x == 1:
-            # TODO
+        cvt_row_to_side = lambda row: BLACK if row < 2 else WHITE
+        if x == 1 or x == board.size-2:
+            return Pawn(cvt_row_to_side(x), board, space)
+        elif x > 1 and x < board.size-2:
+            return None
+        elif y == 0 or y == self.size - 1:
+            return Rook(cvt_row_to_side(x), board, space)
+        elif y == 1 or y == self.size - 2:
+            return Knight(cvt_row_to_side(x), board, space)
+        elif y == 2 or y == self.size - 3:
+            return Bishop(cvt_row_to_side(x), board, space)
+        elif y == 3:
+            return Queen(cvt_row_to_side(x), board, space)
+        elif y == 4:
+            return King(cvt_row_to_side(x), board, space)
 
 
-# Whites:
-# ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
-# ♙
-
-# Blacks:
-# ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
-# ♟
 class Pawn(Piece):
     "Concrete piece class for a pawn"
 
@@ -29,56 +36,147 @@ class Pawn(Piece):
         if self._side == BLACK:
             self._symbol = u"♟"
             self._directions = ["s"]
+        self._first_move = True
 
     def enumerate_moves(self):
-        # moves = CheckersMoveSet() # TODO
-
-        # jump moves
-        # done first since we can skip singles if we find any jumps
-        self._enumerate_jumps(moves, self._current_space, [])
-
-        # basic moves
-        if len(moves) == 0:
-            for direction in self._directions:
-                one_step = self._board.get_dir(self._current_space, direction)
-                if one_step and one_step.is_free():
-                    m = CheckersMove(self._current_space, one_step)
-                    moves.append(m)
-                    if (self._side == WHITE and one_step.row == 0) or \
-                            (self._side == BLACK and one_step.row == self._board.size - 1):
-                        m.add_promotion()
-
+        """Used to find possible moves and captures that this piece can make"""
+        add_ew = lambda x: [x+'e', x+'w']
+        allowed_catches = add_ew(self._directions)
+        moves = []
+        # First add the one/2 forward move
+        new_slot = self._board.get_dir(self._current_space, self._directions)
+        if new_slot and new_slot.is_free():
+            moves.append(ChessMove(self._current_space, new_slot))
+            if (self._side == BLACK and new_slot.row == self._board.size - 1) or \
+                (self._side == WHITE and new_slot.row == 0):
+                moves[-1].add_promotion()
+        if self._first_move:
+            new_slot = self._board.get_dir(new_slot, self._directions)
+            if new_slot and new_slot.is_free():
+                moves.append(ChessMove(self._current_space, new_slot))
+        # Now add all the captures.
+        for direction in allowed_catches:
+            new_slot = self._board.get_dir(self._current_space, direction)
+            if new_slot and new_slot.has_opponent(self._side):
+                moves.append(ChessMove(self._current_space, new_slot, [new_slot]))
+                if (self._side == BLACK and new_slot.row == self._board.size - 1) or \
+                    (self._side == WHITE and new_slot.row == 0):
+                    moves[-1].add_promotion()
         return moves
-
-    def _enumerate_catches(self, moves, current_space, captured, midjump=False):
-        """Used to find possible captures that your piece can make"""
-        if self._side == WHITE:
-            allowed_directions = ["nw", "ne"]
-        else:
-            allowed_directions = ["sw", "se"]
-        catch_moves = []
-        for direction in allowed_directions:
-            self._board.get_dir(current_space, direction)
-            
-
 
     def promote(self):
         "Overrides promote to return a KingChecker in the same space for the same side"
-        return KingChecker(self._side, self._board, self._current_space)
+        return Queen(self._side, self._board, self._current_space)
 
 
-class KingChecker(Checker):
-    "Same as a basic checker except that it can move in all 4 directions, has a different symbol, and cannot be promoted further"
+class King(Piece):
+    "Can move only a single step in any of all 8 immediate directions"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._directions = ["n", "e", "s", "w", "ne", "nw", "se", "sw"]
+        if self._side == WHITE:
+            self._symbol = u"♔"
+        if self._side == BLACK:
+            self._symbol = u"♚"
+    
+    def enumerate_moves(self):
+        moves = []
+        for direction in self._directions:
+            new_slot = self._board.get_dir(self._current_space, direction)
+            if new_slot and new_slot.is_free():
+                m = ChessMove(self._current_space, new_slot)
+            elif new_slot and new_slot.has_opponent(self._side):
+                m = ChessMove(self._current_space, new_slot, [new_slot])
+            moves.append(m)
+        return moves
+
+
+class Rook(Piece):
+    """
+    Concrete class for rooks. This will also be a template for pieces that 
+    can move to any distance in a straight line from their position.
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._directions = ["ne", "nw", "se", "sw"]
         if self._side == WHITE:
-            self._symbol = u"⚇"
+            self._symbol = u"♖"
         if self._side == BLACK:
-            self._symbol = u"⚉"
+            self._symbol = u"♜"
+        self._directions = ["n", "e", "s", "w"]  # But can move to any distance on the board.
 
-    def promote(self):
-        "Override promote to return self since a king cannot be promoted further"
-        return self
+    def enumerate_moves(self):
+        moves = []
+        for direction in self._directions:
+            end_reached = False:
+            while not end_reached:
+                next_slot = self._board.get_dir(self._current_space, direction)
+                if not new_slot:
+                    end_reached = True
+                elif next_slot.is_free():
+                    moves.append(ChessMove(self._current_space, new_slot))
+                elif new_slot.has_opponent(self._side):
+                    moves.append(ChessMove(self._current_space, new_slot, [new_slot]))
+                    end_reached = True
+                else:
+                    assert new_slot.piece._side != self._side  # TODO: remove later.
+                    end_reached = True
+        return moves
+    
 
+class Bishop(Rook):
+    """Concrete class for bishop"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self._side == WHITE:
+            self._symbol = u"♗"
+        if self._side == BLACK:
+            self._symbol = u"♝"
+        self._directions = ["ne", "se", "sw", "nw"]
+
+
+class Queen(Rook):
+    """Concrete class for queen"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self._side == WHITE:
+            self._symbol = u"♗"
+        if self._side == BLACK:
+            self._symbol = u"♝"
+        self._directions = ["n", "e", "s", "w", "ne", "se", "sw", "nw"]
+
+
+class Knight(Piece):
+    """Concrete class for knights"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self._side == WHITE:
+            self._symbol = u"♘"
+        if self._side == BLACK:
+            self._symbol = u"♞"
+
+    def enumerate_moves(self):
+        moves = []
+        directions_array = [["n", "s"], ["e", "w"]]
+        for k in range(2):
+            first_directions = directions_array[k]
+            for direction in first_directions:
+                step1 = self._board.get_dir(self._current_space, direction)
+                if not step1:
+                    continue
+                step2 = self._board.get_dir(step1, direction)
+                if not step2:
+                    continue
+                next_dirs = directions_array[(k+1)%2]
+                for next_direction in next_dirs:
+                    step3 = self._board.get_dir(step2, next_direction)
+                    if not step3:
+                        continue
+                    elif step3.is_free():
+                        moves.append(ChessMove(self._current_space, step3))
+                    elif step3.has_opponent(self._side):
+                        moves.append(ChessMove(self._current_space, step3, [step3]))
+        return moves
