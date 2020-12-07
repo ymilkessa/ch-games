@@ -6,6 +6,8 @@ import sys
 
 from checkers.pieces import CheckerFactory
 from checkers.game_state import CheckersGameState
+from chess.pieces import ChessPieceFactory
+from chess.game_state import ChessGameState
 
 
 class GameHistory():
@@ -65,13 +67,11 @@ class GameDriver:
         # create board, set up, and initialize game state
         if not game_type in ["checkers", "chess"]:
             raise Exception(f"Invalid argument {game_type}")
-        # TODO: Add options for Chess GameState, Board(?), PieceFactory
-        if game_type == "chess":
-            pass
-        else:
-            b = Board(int(size), CheckerFactory())
+        state_type = ChessGameState if game_type == "chess" else CheckersGameState
+        factory = ChessPieceFactory if game_type == "chess" else CheckerFactory
+        b = Board(int(size), factory())
         b.set_up()
-        self._game_state = CheckersGameState(b, WHITE, None)
+        self._game_state = state_type(b, WHITE, None)
 
         # set up players
         self._players = {
@@ -150,7 +150,7 @@ if __name__ == "__main__":
             sys.exit()
     else:
         player2 = Player.create_player("human")
-    if len(sys.argv) > 4:
+    if game_type != "chess" and len(sys.argv) > 4:
         size = sys.argv[4]
     else:
         size = 8

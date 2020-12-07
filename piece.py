@@ -31,3 +31,4 @@ class Piece:
 
     def is_valid_move(self, new_space):
         return new_space in self.enumerate_moves()
+

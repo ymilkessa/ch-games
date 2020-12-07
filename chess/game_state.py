@@ -1,6 +1,7 @@
 from game_state import GameState
 from chess.moves import ChessMove
 from constants import BLACK, WHITE
+from chess.pieces import King
 
 
 class ChessGameState(GameState):
@@ -10,5 +11,7 @@ class ChessGameState(GameState):
         if not side:
             side = self._current_side
         pieces = self._board.pieces_iterator(side)
-        array = [1 for piece in pieces if isinstance(piece, King) else 0]
-        return sum(array) == 0
+        for piece in pieces:
+            if isinstance(piece, King):
+                return False
+        return True

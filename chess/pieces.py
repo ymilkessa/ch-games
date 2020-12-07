@@ -6,18 +6,19 @@ from chess.moves import ChessMove
 
 class ChessPieceFactory(PieceFactory):
     """Generates the chess piece for a given slot when setting up the board"""
-    def create_pieces(self, board, space):
+
+    def create_piece(self, board, space):
         x, y = space.row, space.col
         cvt_row_to_side = lambda row: BLACK if row < 2 else WHITE
         if x == 1 or x == board.size-2:
             return Pawn(cvt_row_to_side(x), board, space)
         elif x > 1 and x < board.size-2:
             return None
-        elif y == 0 or y == self.size - 1:
+        elif y == 0 or y == board.size - 1:
             return Rook(cvt_row_to_side(x), board, space)
-        elif y == 1 or y == self.size - 2:
+        elif y == 1 or y == board.size - 2:
             return Knight(cvt_row_to_side(x), board, space)
-        elif y == 2 or y == self.size - 3:
+        elif y == 2 or y == board.size - 3:
             return Bishop(cvt_row_to_side(x), board, space)
         elif y == 3:
             return Queen(cvt_row_to_side(x), board, space)
@@ -36,24 +37,25 @@ class Pawn(Piece):
         if self._side == BLACK:
             self._symbol = u"♟"
             self._directions = ["s"]
-        self._first_move = True
 
     def enumerate_moves(self):
         """Used to find possible moves and captures that this piece can make"""
         add_ew = lambda x: [x+'e', x+'w']
-        allowed_catches = add_ew(self._directions)
+        allowed_catches = add_ew(self._directions[0])
         moves = []
-        # First add the one/2 forward move
-        new_slot = self._board.get_dir(self._current_space, self._directions)
+        # First add the one/two step forward moves
+        new_slot = self._board.get_dir(self._current_space, self._directions[0])
         if new_slot and new_slot.is_free():
             moves.append(ChessMove(self._current_space, new_slot))
             if (self._side == BLACK and new_slot.row == self._board.size - 1) or \
                 (self._side == WHITE and new_slot.row == 0):
                 moves[-1].add_promotion()
-        if self._first_move:
-            new_slot = self._board.get_dir(new_slot, self._directions)
+        if (self._side == BLACK and self._current_space.row == 1) or \
+            (self._side == WHITE and self._current_space.row == self._board.size -2):
+            new_slot = self._board.get_dir(new_slot, self._directions[0])
             if new_slot and new_slot.is_free():
                 moves.append(ChessMove(self._current_space, new_slot))
+
         # Now add all the captures.
         for direction in allowed_catches:
             new_slot = self._board.get_dir(self._current_space, direction)
@@ -85,9 +87,10 @@ class King(Piece):
             new_slot = self._board.get_dir(self._current_space, direction)
             if new_slot and new_slot.is_free():
                 m = ChessMove(self._current_space, new_slot)
+                moves.append(m)
             elif new_slot and new_slot.has_opponent(self._side):
                 m = ChessMove(self._current_space, new_slot, [new_slot])
-            moves.append(m)
+                moves.append(m)
         return moves
 
 
@@ -108,18 +111,19 @@ class Rook(Piece):
     def enumerate_moves(self):
         moves = []
         for direction in self._directions:
-            end_reached = False:
+            end_reached = False
+            next_slot = self._current_space
             while not end_reached:
-                next_slot = self._board.get_dir(self._current_space, direction)
-                if not new_slot:
+                next_slot = self._board.get_dir(next_slot, direction)
+                if not next_slot:
                     end_reached = True
                 elif next_slot.is_free():
-                    moves.append(ChessMove(self._current_space, new_slot))
-                elif new_slot.has_opponent(self._side):
-                    moves.append(ChessMove(self._current_space, new_slot, [new_slot]))
+                    moves.append(ChessMove(self._current_space, next_slot))
+                elif next_slot.has_opponent(self._side):
+                    moves.append(ChessMove(self._current_space, next_slot, [next_slot]))
                     end_reached = True
                 else:
-                    assert new_slot.piece._side != self._side  # TODO: remove later.
+                    assert next_slot.piece._side == self._side  # TODO: remove later.
                     end_reached = True
         return moves
     
@@ -142,9 +146,9 @@ class Queen(Rook):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self._side == WHITE:
-            self._symbol = u"♗"
+            self._symbol = u"♕"
         if self._side == BLACK:
-            self._symbol = u"♝"
+            self._symbol = u"♛"
         self._directions = ["n", "e", "s", "w", "ne", "se", "sw", "nw"]
 
 
