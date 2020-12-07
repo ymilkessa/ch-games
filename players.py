@@ -77,10 +77,10 @@ class SimpleCompPlayer(Player):
         max_captures = 0
         potential_moves = []
         for m in options:
-            if m.num_captures() > max_captures:
+            if m.val_of_captures() > max_captures:
                 potential_moves = [m]
                 max_captures = m.num_captures()
-            elif m.num_captures() == max_captures:
+            elif m.val_of_captures() == max_captures:
                 potential_moves.append(m)
 
         selected_move = random.choice(potential_moves)

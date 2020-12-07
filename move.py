@@ -77,3 +77,6 @@ class Move:
 
     def num_captures(self):
         return len(self._captures)
+    
+    def val_of_captures(self):
+        return sum([space.value() for space in self._captures])

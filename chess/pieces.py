@@ -37,6 +37,7 @@ class Pawn(Piece):
         if self._side == BLACK:
             self._symbol = u"♟"
             self._directions = ["s"]
+        self._value = 1
 
     def enumerate_moves(self):
         """Used to find possible moves and captures that this piece can make"""
@@ -80,6 +81,7 @@ class King(Piece):
             self._symbol = u"♔"
         if self._side == BLACK:
             self._symbol = u"♚"
+        self._value = 100
     
     def enumerate_moves(self):
         moves = []
@@ -107,6 +109,7 @@ class Rook(Piece):
         if self._side == BLACK:
             self._symbol = u"♜"
         self._directions = ["n", "e", "s", "w"]  # But can move to any distance on the board.
+        self._value = 5
 
     def enumerate_moves(self):
         moves = []
@@ -138,6 +141,7 @@ class Bishop(Rook):
         if self._side == BLACK:
             self._symbol = u"♝"
         self._directions = ["ne", "se", "sw", "nw"]
+        self._value = 3
 
 
 class Queen(Rook):
@@ -150,6 +154,7 @@ class Queen(Rook):
         if self._side == BLACK:
             self._symbol = u"♛"
         self._directions = ["n", "e", "s", "w", "ne", "se", "sw", "nw"]
+        self._value = 9
 
 
 class Knight(Piece):
@@ -161,6 +166,7 @@ class Knight(Piece):
             self._symbol = u"♘"
         if self._side == BLACK:
             self._symbol = u"♞"
+        self._value = 3
 
     def enumerate_moves(self):
         moves = []

@@ -8,10 +8,15 @@ class Piece:
         # read only property
         self._side = side
         self._symbol = None  # Gets added in concrete class
+        self._value = 1  # This gets replaced in concrete classes
 
     @property
     def side(self):
         return self._side
+    
+    @property
+    def value(self):
+        return self._value  # This will get over-ridden by subclasses.
 
     def __str__(self):
         return self._symbol

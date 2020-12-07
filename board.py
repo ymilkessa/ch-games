@@ -92,6 +92,12 @@ class Space:
             return self._piece.side != side
         else:
             return False
+    
+    def value(self):
+        if self._piece:
+            return self._piece.value
+        else:
+            return 0
 
 
 class Board:
