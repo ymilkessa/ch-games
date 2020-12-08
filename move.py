@@ -84,10 +84,14 @@ class Move:
         return sum([space.value() for space in self._captures])
     
     def copy_from(self, new_state):
-        new_move = deepcopy(self)
-        new_move._start = new_state.get_space(self._start)
-        new_move._end = new_state.get_space(self._end)
+        new_start = new_state.get_space(self._start)
+        new_end = new_state.get_space(self._end)
+        new_move = Move(new_start, new_end)
         captures_list = []
         for space in self._captures:
             captures_list.append(new_state.get_space(space))
+        new_move._captured_pieces = {}
+        for space, piece in self._captured_pieces.items():
+            captured_space = new_state.get_space(space)
+            new_move._captured_pieces[captured_space] = captured_space.piece
         return new_move
