@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 class Move:
     """
     Implements a command pattern for moves
@@ -80,3 +82,12 @@ class Move:
     
     def val_of_captures(self):
         return sum([space.value() for space in self._captures])
+    
+    def copy_from(self, new_state):
+        new_move = deepcopy(self)
+        new_move._start = new_state.get_space(self._start)
+        new_move._end = new_state.get_space(self._end)
+        captures_list = []
+        for space in self._captures:
+            captures_list.append(new_state.get_space(space))
+        return new_move

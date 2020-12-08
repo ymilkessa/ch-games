@@ -1,4 +1,5 @@
 from constants import BLACK, WHITE
+from copy import deepcopy
 
 
 class GameState():
@@ -63,6 +64,30 @@ class GameState():
 
         return options
 
+    def get_expected_utility(self, m, depth, side=None):
+        """Applies the minimax algorith to recursively compute the expected gain/loss total of making a move. 
+
+        Args:
+            m (move): the move instance you want to check
+            depth (int): how many steps of recursion you want to make
+            side (bool, optional): Default gets replaced by the current side, either WHITE or BLACK 
+        """
+        current_utility = m.val_of_captures()
+        if depth == 0:
+            return current_utility
+        state_copy = deepcopy(self)
+        move_copy = m.copy_from(state_copy)
+        if move_copy._start.piece is None:
+        move_copy.execute(state_copy)
+        # Now you're in the oponent's shoes.
+        next_moves = state_copy.all_possible_moves()
+        highest_value = -1000  # Better to use than math.inf
+        for poss_m in next_moves:  # poss_m means 'possible_move'
+            next_util = state_copy.get_expected_utility(poss_m, depth-1)
+            if next_util > highest_value:
+                highest_value = next_util
+        return current_utility - highest_value
+
     def check_draw(self, side=None):
         if not side:
             side = self._current_side
@@ -78,3 +103,6 @@ class GameState():
     def check_loss(self, side=None):
         # Specific rules for loss should be implemented per game
         raise NotImplementedError()
+    
+    def get_space(self, space):
+        return self.board.get_space_from_coords((space.row, space.col))

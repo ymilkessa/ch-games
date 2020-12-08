@@ -19,6 +19,8 @@ class Player:
             return RandomCompPlayer()
         elif player_type == "simple":
             return SimpleCompPlayer()
+        elif player_type.startswith("minimax"):
+            return MinimaxCompPlayer(int(player_type[7:]))
         else:
             return None
 
@@ -86,3 +88,27 @@ class SimpleCompPlayer(Player):
         selected_move = random.choice(potential_moves)
         print(selected_move)
         selected_move.execute(game_state)
+
+
+class MinimaxCompPlayer(Player):
+    """Uses the minimax algorithm to pick a move"""
+
+    def __init__(self, depth=1):
+        super().__init__()
+        self._depth = depth
+    
+    def take_turn(self, game_state):
+        options = game_state.all_possible_moves()
+        max_utility = -1000
+        potential_moves = []
+        for m in options:
+            utility = game_state.get_expected_utility(m, self._depth)
+            if utility > max_utility:
+                potential_moves = [m]
+                max_utility = utility
+            elif utility == max_utility:
+                potential_moves.append(m)
+
+        selected_move = random.choice(potential_moves)
+        print(selected_move)
+        selected_move.execute(game_state)        

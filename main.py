@@ -133,7 +133,6 @@ class GameDriver:
 if __name__ == "__main__":
 
     # take in arguments and setup defaults if necessary
-    # TODO: Change this to accommodate chess.
     if len(sys.argv) > 1:
         game_type = sys.argv[1]
     else:

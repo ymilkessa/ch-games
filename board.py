@@ -128,6 +128,10 @@ class Board:
         "Gets the space in the board for the given coordinate such as b5 or a1"
         coord = convert_checker_coord(coord)
         return self._board[coord[0]][coord[1]]
+    
+    def get_space_from_coords(self, coord):
+        "Gets the space in the board for the given matrix coordinate"
+        return self._board[coord[0]][coord[1]]
 
     def __str__(self):
         "String for printing the spaces in the board with alphanumeric coordinates"

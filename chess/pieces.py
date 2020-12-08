@@ -126,7 +126,7 @@ class Rook(Piece):
                     moves.append(ChessMove(self._current_space, next_slot, [next_slot]))
                     end_reached = True
                 else:
-                    assert next_slot.piece._side == self._side  # TODO: remove later.
+                    assert next_slot.piece._side == self._side  # TODO: remove later
                     end_reached = True
         return moves
     
