@@ -10,6 +10,3 @@ class ChessMove(Move):
             return f"basic move: {self._start}->{self._end}"
         else:
             return f"jump move: {self._start}->{self._end}, capturing {self._captures}"
-
-    def is_jump(self):
-        return len(self._captures) > 0

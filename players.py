@@ -98,17 +98,7 @@ class MinimaxCompPlayer(Player):
         self._depth = depth
     
     def take_turn(self, game_state):
-        options = game_state.all_possible_moves()
-        max_utility = -1000
-        potential_moves = []
-        for m in options:
-            utility = game_state.get_expected_utility(m, self._depth)
-            if utility > max_utility:
-                potential_moves = [m]
-                max_utility = utility
-            elif utility == max_utility:
-                potential_moves.append(m)
-
-        selected_move = random.choice(potential_moves)
+        best_option = game_state.get_optimal_move(self._depth)
+        selected_move = best_option[0]
         print(selected_move)
         selected_move.execute(game_state)        

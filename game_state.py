@@ -1,5 +1,6 @@
 from constants import BLACK, WHITE
 from copy import deepcopy
+import random
 
 
 class GameState():
@@ -64,29 +65,49 @@ class GameState():
 
         return options
 
-    def get_expected_utility(self, m, depth, side=None):
+    def get_optimal_move(self, depth, best_so_far=-1000, side=None):
         """Applies the minimax algorith to recursively compute the expected gain/loss total of making a move. 
 
         Args:
-            m (move): the move instance you want to check
             depth (int): how many steps of recursion you want to make
-            side (bool, optional): Default gets replaced by the current side, either WHITE or BLACK 
+            side (bool, optional): Default gets replaced by the current side, either WHITE or BLACK
+            best_so_far (int): The best utility from neighboring branches; for alpha-beta pruning
+        Return:
+            tuple([optimal_move, expected_value]): optimal_move is a Move instance; expected_value is an int
         """
-        current_utility = m.val_of_captures()
-        if depth == 0:
-            return current_utility
-        state_copy = deepcopy(self)
-        move_copy = m.copy_from(state_copy)
-        if move_copy._start.piece is None:
-        move_copy.execute(state_copy)
-        # Now you're in the oponent's shoes.
-        next_moves = state_copy.all_possible_moves()
-        highest_value = -1000  # Better to use than math.inf
+        if side == None:
+            side = self._current_side
+        next_moves = self.all_possible_moves(side)  # Cannot be [] at this point
+        options_list = []
         for poss_m in next_moves:  # poss_m means 'possible_move'
-            next_util = state_copy.get_expected_utility(poss_m, depth-1)
-            if next_util > highest_value:
-                highest_value = next_util
-        return current_utility - highest_value
+            current_utility = poss_m.val_of_captures()
+            if depth == 0:
+                new_option = (poss_m, current_utility)
+            else:
+                state_copy = deepcopy(self)
+                move_copy = poss_m.copy_from(state_copy)
+                move_copy.execute(state_copy)
+                # Now you're in the oponent's shoes.
+                opponent_move = state_copy.get_optimal_move(depth-1, best_so_far)
+                new_option = (poss_m, current_utility-opponent_move[1])
+                # Do the alpha-beta pruing
+                if new_option[1] > best_so_far:
+                    best_so_far = new_option[1]
+                elif new_option[1] < best_so_far:
+                    # break the loop here
+                    options_list = [new_option]
+                    break
+            options_list.append(new_option)
+        
+        # Now pick the option with the highest utility
+        best_option = options_list[0]
+        for next_option in options_list[1:]:
+            if next_option[1] > best_option[1]:
+                best_option = next_option
+            elif next_option[1] == best_option[1]:
+                best_option = random.choice([next_option, best_option])
+        return (best_option[0].copy_from(self), best_option[1])
+
 
     def check_draw(self, side=None):
         if not side:
