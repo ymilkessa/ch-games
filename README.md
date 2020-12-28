@@ -10,7 +10,7 @@ There are three ways in which the computer can play the game. The first is `rand
 
 1. Clone this repository
 2. Go into the main folder: `cd ch-games`
-3. Enter a run command in this format: `python3 main.py <game-type> <player1> <player2> <size> <history>
+3. Enter a run command in this format: ```python3 main.py <game-type> <player1> <player2> <size> <history>```
 
 For `<game-type>`, you should write either `chess` or `checkers`.
 For `<player1>`, write one of `human`, `simple`, `random` or `minimax#` (where # is replaced by an integer). Do the same for `<player2>`. Player1 plays the **white** pieces while player2 plays the **black** pieces.
