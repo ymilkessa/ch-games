@@ -77,7 +77,7 @@ class GameState():
         """
         if side == None:
             side = self._current_side
-        next_moves = self.all_possible_moves(side)  # Cannot be [] at this point
+        next_moves = self.all_possible_moves(side)  # This cannot be [] at this point
         options_list = []
         for poss_m in next_moves:  # poss_m means 'possible_move'
             current_utility = poss_m.val_of_captures()
@@ -87,8 +87,11 @@ class GameState():
                 state_copy = deepcopy(self)
                 move_copy = poss_m.copy_from(state_copy)
                 move_copy.execute(state_copy)
-                # Now you're in the oponent's shoes.
-                opponent_move = state_copy.get_optimal_move(depth-1, best_so_far)
+                # Now you're in the oponent's shoes. First check if the game is over already
+                if self.check_loss() or self.check_draw():
+                    opponent_move = [None, 0]
+                else:
+                    opponent_move = state_copy.get_optimal_move(depth-1, best_so_far)
                 new_option = (poss_m, current_utility-opponent_move[1])
                 # Do the alpha-beta pruing
                 if new_option[1] > best_so_far:
@@ -99,6 +102,9 @@ class GameState():
                     break
             options_list.append(new_option)
         
+        # debugging block
+        if not options_list:
+            breakpoint()
         # Now pick the option with the highest utility
         best_option = options_list[0]
         for next_option in options_list[1:]:

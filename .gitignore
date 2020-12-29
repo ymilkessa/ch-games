@@ -1,0 +1,7 @@
+./checkers/__pycache__
+./chess/__pycache__
+./__pycache__
+__*
+*/__*
+uml for checkers and chess.pdf
+Pipfile
