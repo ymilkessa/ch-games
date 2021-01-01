@@ -3,6 +3,8 @@ import sys
 from players import Player
 from main import GameDriver
 from gui import Gui
+from chess.gui import ChessGui
+from checkers.gui import CheckersGui
 
 class VisualGameDriver(GameDriver):
     """
@@ -10,7 +12,12 @@ class VisualGameDriver(GameDriver):
     """
     def __init__(self, *args):
         super().__init__(*args)
-        self._game_state.use_gui()  # TODO: Still haven't defined this yet.
+        # make the gui based on the game type
+        if args[0] == "chess":
+            self._game_state.gui = ChessGui(self._game_state.board_reference)  # Maybe don't need the argument
+        elif args[0] == "checkers":
+            self._game_state.gui = CheckersGui(self._game_state.board_reference)
+        self._game_state.use_gui()  # TODO: Still haven't completed this yet
 
 if __name__ == "__main__":
 

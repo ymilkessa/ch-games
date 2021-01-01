@@ -14,6 +14,7 @@ class GameState():
         self._board = board
         # public property
         self._draw_counter = 0
+        self.gui = None
 
     @property
     def current_side(self):
@@ -26,6 +27,10 @@ class GameState():
     @property
     def draw_counter(self):
         return self._draw_counter
+    
+    @property
+    def board_reference(self):
+        return self._board
 
     @draw_counter.setter
     def draw_counter(self, c):
@@ -48,8 +53,17 @@ class GameState():
             raise ValueError("Current player is neither black nor white")
         return f"{self._board}\nTurn: {self._turn_counter}, {side_string}"
 
-    def use_gui(self):
-        self.gui = Gui(self._board.board_matrix())  # TODO: need to write what this initiates
+    # def use_gui(self):
+    #     self.gui = Gui(self.board_matrix())  # TODO: need to write what this initiates
+    
+    def board_matrix(self):
+        return self._board.board_matrix()
+    
+    def show_move(self, move):
+        if not self.gui:
+            pass
+        else:
+            self.gui.show_move(move)
 
 
     def all_possible_moves(self, side=None):
@@ -138,5 +152,3 @@ class GameState():
     
     def get_space(self, space):
         return self.board.get_space_from_coords((space.row, space.col))
-
-

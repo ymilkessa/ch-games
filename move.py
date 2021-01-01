@@ -47,6 +47,8 @@ class Move:
             self._promoted_piece = self._end.piece
             self._end.piece = self._end.piece.promote()
 
+        game_state.show_move(self)  # When playing the gui version, this should show the move on the board
+
         # advance turn and update draw counter
         game_state.next_turn()
         if self.num_captures() > 0:

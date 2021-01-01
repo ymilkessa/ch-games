@@ -1,3 +1,4 @@
+from constants import BLACK, WHITE
 
 class Piece:
     "Abstract piece class"
@@ -13,6 +14,15 @@ class Piece:
     @property
     def side(self):
         return self._side
+
+    def side_string(self):
+        if self.side == WHITE:
+            return "white"
+        else:
+            return "black"
+    
+    def coordinates(self):
+        return (self._current_space.row, self._current_space.col)
     
     @property
     def value(self):
@@ -20,6 +30,9 @@ class Piece:
 
     def __str__(self):
         return self._symbol
+
+    def type_string(self):
+        raise NotImplementedError
 
     def move(self, space):
         self._current_space = space

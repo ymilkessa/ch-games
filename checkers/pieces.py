@@ -30,6 +30,9 @@ class Checker(Piece):
             self._directions = ["se", "sw"]
         self._value = 1
 
+    def type_string(self):
+        return self.side_string() + "man"
+
     def enumerate_moves(self):
         moves = CheckersMoveSet()
 
@@ -95,6 +98,9 @@ class KingChecker(Checker):
         if self._side == BLACK:
             self._symbol = u"⚉"
         self._value = 2
+
+    def type_string(self):
+        return self.side_string() + "king"
 
     def promote(self):
         "Override promote to return self since a king cannot be promoted further"

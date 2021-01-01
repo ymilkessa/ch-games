@@ -38,6 +38,9 @@ class Pawn(Piece):
             self._symbol = u"♟"
             self._directions = ["s"]
         self._value = 1
+    
+    def type_string(self):
+        return self.side_string() + "pawn"
 
     def enumerate_moves(self):
         """Used to find possible moves and captures that this piece can make"""
@@ -82,6 +85,9 @@ class King(Piece):
         if self._side == BLACK:
             self._symbol = u"♚"
         self._value = 100
+
+    def type_string(self):
+        return self.side_string() + "king"
     
     def enumerate_moves(self):
         moves = []
@@ -110,6 +116,9 @@ class Rook(Piece):
             self._symbol = u"♜"
         self._directions = ["n", "e", "s", "w"]  # But can move to any distance on the board.
         self._value = 5
+
+    def type_string(self):
+        return self.side_string() + "rook"
 
     def enumerate_moves(self):
         moves = []
@@ -143,6 +152,9 @@ class Bishop(Rook):
         self._directions = ["ne", "se", "sw", "nw"]
         self._value = 3
 
+    def type_string(self):
+        return self.side_string() + "rook"
+
 
 class Queen(Rook):
     """Concrete class for queen"""
@@ -156,6 +168,9 @@ class Queen(Rook):
         self._directions = ["n", "e", "s", "w", "ne", "se", "sw", "nw"]
         self._value = 9
 
+    def type_string(self):
+        return self.side_string() + "queen"
+
 
 class Knight(Piece):
     """Concrete class for knights"""
@@ -167,6 +182,9 @@ class Knight(Piece):
         if self._side == BLACK:
             self._symbol = u"♞"
         self._value = 3
+
+    def type_string(self):
+        return self.side_string() + "knight"
 
     def enumerate_moves(self):
         moves = []
