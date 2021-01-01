@@ -1,7 +1,8 @@
-from constants import BLACK, WHITE
-from copy import deepcopy
 import random
+from copy import deepcopy
 
+from constants import BLACK, WHITE
+from gui import Gui
 
 class GameState():
     def __init__(self, board, side, players):
@@ -46,6 +47,10 @@ class GameState():
         else:
             raise ValueError("Current player is neither black nor white")
         return f"{self._board}\nTurn: {self._turn_counter}, {side_string}"
+
+    def use_gui(self):
+        self.gui = Gui(self._board.board_matrix())  # TODO: need to write what this initiates
+
 
     def all_possible_moves(self, side=None):
         """Iterates over a side's pieces and returns a list containing all legal moves
@@ -133,3 +138,5 @@ class GameState():
     
     def get_space(self, space):
         return self.board.get_space_from_coords((space.row, space.col))
+
+

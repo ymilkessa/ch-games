@@ -37,6 +37,11 @@ class Move:
             self._start.piece = None             # clear old space
             self._end.piece.move(self._end)      # update piece object
 
+        # Do this if this is a visual game state
+        if hasattr(game_state, 'gui'):
+            path = [self._start] + self._captures + [self._end]
+            game_state.show_move(path)
+
         # promote piece
         if self._promotion:
             self._promoted_piece = self._end.piece

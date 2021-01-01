@@ -83,6 +83,13 @@ class Space:
                 return u"◻"
         else:
             return str(self._piece)
+    
+    def space_matrix_value(self):
+        "Returns 0 if this is a white box, and 1 if it is black"
+        if abs(self._row - self._col) % 2 == 0:
+            return 1
+        else:
+            return 0
 
     def is_free(self) -> bool:
         return self._piece is None
@@ -116,6 +123,11 @@ class Board:
     @property
     def size(self):
         return self._size
+
+    def board_matrix(self):
+        "Returns a matrix with a zero for each white box and a one for each black box"
+        matrix = [[space.space_matrix_value() for space in row] for row in self._board]
+        return matrix
 
     def set_up(self):
         "Uses an abstract piece factory to set up all spaces in the board"
